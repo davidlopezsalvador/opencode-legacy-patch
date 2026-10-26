@@ -32,6 +32,11 @@ layout, your options are:
 3. **Community alternatives** (not affiliated with this repo):
    - `kuznecov-anatoliy/opencode-old-interface` — unofficial fork (base is
      actually upstream v1.18.30, unsigned binaries).
+   - **aa2013's `layoutUpgrade()` patch** (issue #48882) — an alternative
+     v1-only patch that targets `if (layoutUpgrade()) return true;` and
+     replaces it with `return false;` (equal-length, padded with spaces).
+     Same idea as this repo but a different code path; useful if the sunset
+     literal is removed but `layoutUpgrade()` remains.
    - macOS: `restore-old-ui.sh` (see issue #48882 comments).
    - Linux: `perl -0777 -pi -e 's/new Date\(2026,8,14\)/new Date(9999,8,14)/'`
      on the installed binary.
