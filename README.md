@@ -9,6 +9,43 @@ Restores the **legacy UI of OpenCode Desktop (Windows)** by patching the one-lin
 
 ---
 
+## Compatibility — OpenCode v2 (2.0+) is NOT supported
+
+OpenCode 2.0+ completely removed the legacy-UI sunset mechanism that this patch
+relies on:
+
+- The `oldInterfaceSunset = new Date(2026, 8, 14)` constant is gone.
+- `resolveNewLayoutDesigns`, `newLayoutDesigns`, `oldLayoutEligible` and the
+  `oldInterfaceSunset` toggle are gone.
+- There is no legacy-UI switch in v2 (v2 ships a single UI with vertical tabs).
+
+As a result, **this patch does nothing on v2**: the script's `patch` mode runs
+fail-closed (it requires exactly 1 occurrence of the literal and aborts when it
+finds 0), so it will not touch your asar. If you are on v2 and want the old
+layout, your options are:
+
+1. **Stay on v2** and adapt to the new UI (vertical tabs, no persistent
+   project/session sidebar).
+2. **Downgrade to a v1 release** (1.18.34 / 1.18.35 / 1.19.x) where the
+   sunset constant still exists, then re-apply this patch. The last v1 line is
+   `1.19.x`; verify the literal is still present before patching.
+3. **Community alternatives** (not affiliated with this repo):
+   - `kuznecov-anatoliy/opencode-old-interface` — unofficial fork (base is
+     actually upstream v1.18.30, unsigned binaries).
+   - macOS: `restore-old-ui.sh` (see issue #48882 comments).
+   - Linux: `perl -0777 -pi -e 's/new Date\(2026,8,14\)/new Date(9999,8,14)/'`
+     on the installed binary.
+   - `openchamber/openchamber` and `cline/cline` desktop apps as alternative
+     front-ends.
+
+Upstream status: OpenCode 2.0 is out and development is focused on V2; issues
+filed against V1 are being closed as duplicates of
+[#48882](https://github.com/anomalyco/opencode/issues/48882). There is an open
+community request for a V2-equivalent patch ("Need for V2 patch", #49005), but
+no working V2 patch exists at the time of writing.
+
+---
+
 ## Quick start
 
 Script: [`patch-legacy.ps1`](./patch-legacy.ps1)
@@ -108,6 +145,10 @@ Safety analysis of the approach:
 
 ## Updating in the future (workflow)
 
+> ⚠️ **Do not upgrade to OpenCode 2.0+** if you want to keep using this patch:
+> v2 removed the sunset constant entirely, so there is nothing to patch and the
+> legacy UI is gone. Stay on a v1 release (≤ 1.19.x) to keep the patch working.
+
 ```powershell
 # 1. Close OpenCode and go back to official
 & ".\patch-legacy.ps1" -Mode restore
@@ -125,7 +166,10 @@ Safety analysis of the approach:
 
 ## Known limitations and risks
 
-1. **Frozen updates**: while the updater is neutralized, no official bugfixes arrive.
+1. **OpenCode 2.0+ is unsupported** (see "Compatibility" above): the sunset
+   constant and the legacy-UI toggle were removed upstream, so this patch has
+   nothing to patch on v2. Stay on v1 (≤ 1.19.x) to use it.
+2. **Frozen updates**: while the updater is neutralized, no official bugfixes arrive.
    Update manually with the workflow above.
 2. **Upstream literal**: if `new Date(2026, 8, 14)` disappears or changes format, the
    script fails safe (fail-closed) and needs revisiting.
